@@ -21,6 +21,8 @@ The model consists of:
 - A **PID Controller** to adjust the throttle based on the error.
 - A **Transfer Function** block to simulate vehicle response.
 - A **Scope** block to visualize the vehicle's speed over time.
+- A ** Manual Switch** to toogle between real feedback and spoofed feedback
+- A ** Constant Block (Spoofed Speed) ** 
 
 
 
@@ -38,69 +40,108 @@ The model consists of:
 		
 
 
-			Add Blocks:
+Diagram Setup:
 
-				Add a Constant block to represent the desired speed (target speed).
-				Add a Sum block to calculate the error between the desired speed and the actual speed.
-				Add a PID Controller block to adjust the throttle based on the error.
-				Add a Transfer Function block to simulate the vehicle’s response (you can use a simple first-order model with a transfer function: (1)/(1+s)
-				Add a Scope block to display the vehicle’s speed output.
+			1.	Constant Block (Desired Speed):
+				o	Label: Desired Speed
+				o	Value: Set to 50 (this represents the target speed, in km/h or other units).
+				o	Connection: Connect the output of this block to the positive input (+) of the Sum block.
 
+    
+			2.	Sum Block (Error Calculation):
+				o	Configuration: Set this block to have one positive (+) input and one negative (−) input.
+				o	Function: This block will calculate the error between the desired speed and the actual/feedback speed.
+				o	Inputs:
+						Positive Input (+): Connect to the output of the Desired Speed Constant block (target speed).
+						Negative Input (−): Connect to the output of the Manual Switch (feedback loop).
+				o	Output: Connect the output of the Sum block to the input of the PID Controller.
+    
+    
+			3.	PID Controller:
+				o	Function: Adjusts the throttle based on the error signal from the Sum block.
+				o	Input: Connect to the output of the Sum block.
+				o	Output: Connect to the Transfer Function block.
 
-			Connect the Blocks:
-				Connect the Constant block to the Sum block (positive input).
-				Connect the output of the Transfer Function to the negative input of the Sum block.
-				Connect the Sum block to the PID Controller block.
-				Connect the PID Controller block to the Transfer Function.
-				Connect the output of the Transfer Function to the Scope block.
+    
+			4.	Transfer Function (Vehicle Dynamics):
+				o	Label: Transfer Function
+				o	Configuration: Use a simple first-order transfer function (e.g., 1/(s+1)) to simulate the vehicle’s speed response.
+				o	Input: Connect to the output of the PID Controller.
+				o	Output: Connect to one input of the Manual Switch and also to the Scope block to visualize the speed.
 
+    
+			5.	Constant Block (Spoofed Speed):
+				o	Label: Spoofed Speed
+				o	Value: Set to 30 (or a value lower than the desired speed to simulate an attack).
+				o	Output: Connect to one input of the Manual Switch.
 
+    
+			6.	Manual Switch (Select Feedback):
+				o	Function: Allows you to toggle between real feedback (from the Transfer Function) and spoofed feedback (from the Spoofed Speed Constant block).
+				o	Inputs:
+						Input 1: Connect to the output of the Transfer Function (real speed feedback).
+						Input 2: Connect to the output of the Spoofed Speed Constant block.
+				o	Output: Connect the output of the Manual Switch to the negative input (−) of the Sum block (this acts as the feedback input in the control loop).
 
-			Set Parameters:
-				In the Constant block, set the desired speed (e.g., 50 km/h).
-				Configure the PID Controller parameters as needed (e.g., P=1, I=0.5, D=0.1).
-				Set the Transfer Function’s parameters to simulate the vehicle dynamics.
-
-
-
-
-
-
-    # Step 2: Simulate a Cyberattack – Sensor Spoofing
-
-
-               
-	               1.	Add a Manual Switch: Insert a Manual Switch block to toggle between the real speed and a spoofed speed.
-
-                       2.	Add a Constant Block for the Spoofed Value: Add another Constant block to represent the spoofed sensor reading (e.g., set it to a lower value like 30 km/h 																					to simulate an          																attack where the sensor falsely reports a slower speed).
-
-
-	
-
-              Integrate the Spoofed Sensor Data:
-	
-
-                   Connect the output of the Spoofed Constant block to one input of the Manual Switch.
-	           Connect the Transfer Function output (real speed) to the other input of the Manual Switch.
-	           Connect the output of the Manual Switch to the feedback input of the Sum block.
-	           Configure the Switch: The Manual Switch will now let you toggle between the real sensor data and the spoofed sensor data. When toggled to the spoofed value, the control  				system receives incorrect speed data.
-
-
-
-
-     #Step 3: Run and Observe the Results
-
-			1.	Run the Simulation: Start the simulation and observe the output on the Scope.
-
-			2.	Toggle the Switch: While the simulation is running, toggle the Manual Switch to simulate the attack. You’ll see the system respond to the false input, 					trying to reach the incorrect target speed.
-
-			3.	Analyze: Observe how the vehicle’s speed control system attempts to adjust based on the spoofed speed value, demonstrating how an attack on sensor data can 				destabilize CPS.
-
-
-   
+    
+			7.	Scope (Visualization):
+				o	Function: Displays the actual speed of the vehicle over time.
+				o	Input: Connect the output of the Transfer Function to the Scope block to observe the system’s response.
 
 
 
+    
+Summary of Connections:
+	•	Desired Speed Constant → Positive Input (+) of Sum Block
+	•	Output of Sum Block (Error) → PID Controller
+	•	PID Controller Output → Transfer Function
+	•	Transfer Function Output (Real Speed):
+			o	Connect to Input 1 of Manual Switch
+			o	Connect to Scope (to visualize speed)
+	•	Spoofed Speed Constant → Input 2 of Manual Switch
+	•	Manual Switch Output (Feedback) → Negative Input (−) of Sum Block
+
+ 
+This layout provides a structured flow where:
+•	The Sum block calculates the error by subtracting the feedback speed (real or spoofed) from the desired speed.
+•	The PID controller adjusts the control based on the error.
+•	The Transfer Function simulates the vehicle dynamics.
+•	The Manual Switch allows toggling between real and spoofed feedback to observe the impact on system behavior in the Scope.
+
+
+
+
+
+Set Parameters:
+	In the Constant block, set the desired speed (e.g., 50 km/h).
+	Configure the PID Controller parameters as needed (e.g., P=1, I=0.5, D=0.1).
+	Set the Transfer Function’s parameters to simulate the vehicle dynamics.
+
+
+
+ #Step 3: Run and Observe the Results
+
+	1.	Run the Simulation: Start the simulation and observe the output on the Scope.
+
+	2.	Toggle the Switch: While the simulation is running, toggle the Manual Switch to simulate the attack. You’ll see the system respond to the false input, 	trying to reach the incorrect target speed.
+
+	3.	Analyze: Observe how the vehicle’s speed control system attempts to adjust based on the spoofed speed value, demonstrating how an attack on sensor data can destabilize CPS.
+
+
+
+# Expected Results
+
+    
+First Switch Configuration and Scope Output:
+
+	When the Manual Switch is toogled in the first scenario to the desired speed, the vehicle control system will receive real feedback from the Transfer Function (actual speed of the vehicle).
+	Scope Output: The curve is gradually increasing and approaching a stable speed, indicating that the PID controller is working to reach the desired speed (50 km/h). This response suggests normal operation 	without interference.
+
+ 
+Second Switch Configuration and Scope Output:
+
+	When the Manula Switch is toogled again to the spoofed sensor data (the lower, spoofed speed input).
+	Scope Output: The plot shows a significant linear increase, suggesting the control system is reacting to the spoofed data, interpreting it as a low speed. Consequently, it increases the throttle 		excessively in an attempt to reach the desired speed, even though the feedback is incorrect.
 
 
 ## How to Use
