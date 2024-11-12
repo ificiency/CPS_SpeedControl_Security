@@ -144,6 +144,23 @@ Second Switch Configuration and Scope Output:
 	Scope Output: The plot shows a significant linear increase, suggesting the control system is reacting to the spoofed data, interpreting it as a low speed. Consequently, it increases the throttle 		excessively in an attempt to reach the desired speed, even though the feedback is incorrect.
 
 
+
+ Summary of Elements and Their Functions.
+
+	- Constant (Desired Speed): Sets the target speed, e.g., 50 km/h, which the system tries to reach.
+	- Sum Block: Calculates the error by subtracting the feedback speed from the desired speed. This error guides the system's adjustments.
+	- PID Controller: Processes the error and generates a control signal to adjust the vehicle's speed, aiming to reduce the error to zero.
+	- Transfer Function (Vehicle Dynamics): Simulates the vehicle's response to the control signal, providing a real-time output speed.
+	- Constant1 (Spoofed Speed): Represents a fake (lower) speed used to simulate a cyberattack (sensor spoofing).
+	- Manual Switch: Allows toggling between real feedback (from the Transfer Function) and the spoofed feedback. Switching to spoofed feedback simulates a cyberattack.
+	- Scope: Displays the vehicle’s speed over time, helping observe system behavior with real vs. spoofed feedback.
+
+
+ Overall Operation:
+
+ 	The system takes a target speed and compares it with the actual or spoofed speed to calculate an error. The PID controller uses this error to adjust the throttle, aiming to match the actual speed to the 	target. The Manual Switch allows testing of system stability by toggling between real and spoofed sensor data, showing how a cyberattack can affect performance.
+
+
 ## How to Use
 1. Open `CPS_SpeedControlModel.slx` in Simulink.
 2. Run the model to observe the vehicle's speed response on the Scope.
