@@ -92,6 +92,7 @@ Diagram Setup:
 
     
 Summary of Connections:
+
 	•	Desired Speed Constant → Positive Input (+) of Sum Block
 	•	Output of Sum Block (Error) → PID Controller
 	•	PID Controller Output → Transfer Function
